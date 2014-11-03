@@ -517,7 +517,7 @@ cases, only a single <a><code>AudioContext</code></a> is used per document.</p>
   <dt>AudioBuffer createBuffer()</dt>
   <dd> Creates an AudioBuffer of the given size. The audio data in the buffer will
   be zero-initialized (silent).  An NOT_SUPPORTED_ERR exception MUST be thrown
-  if any of the arguments is negative, zero, or outside its nominal range.
+  if any of the arguments is negative, zero, or outside its <a>nominal range</a>.
   <dl class="parameters">
       <dt>unsigned long numberOfChannels</dt>
       <dd> Determines how many channels the buffer will have. An implementation
@@ -1265,6 +1265,11 @@ through the <code>destination</code> attribute of <a><code>AudioContext</code></
 </p>
 
 <p>
+  <a><code>AudioParam</code></a>s have a <dfn>nominal range</dfn>, that is the
+  interval that contains the possible values for this <a><code>AudioParam</code></a>.
+</p>
+
+<p>
   Implementations must use block processing, with each <a><code>AudioNode</code></a>
   processing 128 sample-frames in each block.
 </p>
@@ -1283,7 +1288,7 @@ through the <code>destination</code> attribute of <a><code>AudioContext</code></
   The following methods can change the event list by adding a new event into the
   list of a type specific to the method.  Each event has a time associated with
   it, and the events will always be kept in time-order in the list.  These
-  methods will be called <em>automation</em> methods:
+  methods will be called <dfn>automation methods</dfn>:
 </p>
 
 <ul>
@@ -1562,11 +1567,13 @@ for the time range.
 <li>
 An <a><code>AudioParam</code></a> will take the rendered audio data from any <a><code>AudioNode</code></a> output connected to it and <a href="#down-mix">convert it to mono</a> by down-mixing if it is not
 already mono, then mix it together with other such outputs.  If there are no <a><code>AudioNode</code></a>s connected to it, then this value is 0, having no
-effect on the <em>computedValue</em>.
+effect on the <a>computedValue</a>.
 </li>
 
 <li>
-The <em>computedValue</em> is the sum of the <em>intrinsic</em> value and the value calculated from (2).
+The <a>computedValue</a> is the sum of the <em>intrinsic</em> value and the
+value calculated from (2), and MUST be clamped to the <a>nominal range</a> for
+this parameter.
 </li>
 
 </ol>
@@ -1657,10 +1664,10 @@ param.setValueCurveAtTime(curve, t6, t7 - t6);
   <dt>readonly attribute AudioParam gain</dt>
   <dd>
     Represents the amount of gain to apply. Its default <code>value</code> is 1
-    (no gain change). The nominal <code>minValue</code> is 0, but may be set
-    negative for phase inversion.  The nominal <code>maxValue</code> is 1, but
-    higher values are allowed (no
-    exception thrown).This parameter is <a>a-rate</a>
+    (no gain change). Its <a>nominal range</a> is [-sampleRate/2; sampleRate/2], where
+    <code>sampleRate</code> is the value of the <a href="#widl-AudioContext-sampleRate">
+    <code>sampleRate</code></a> attribute of the
+    <a><code>AudioContext</code></a>. This parameter is <a>a-rate</a>
   </dd>
 </dl>
 </section>
@@ -1696,10 +1703,11 @@ interface is an <a><code>AudioNode</code></a> with a single input and single out
 <dl title="interface DelayNode : AudioNode" class="idl">
   <dt> readonly attribute AudioParam delayTime </dt>
   <dd>
-    An <a><code>AudioParam</code></a> object representing the amount of delay (in seconds)
-    to apply. Its default <code>value</code> is 0 (no delay). The minimum value is
-    0 and the maximum value is determined by the <code>maxDelayTime</code>
-    argument to the <code>AudioContext</code> method <code>createDelay</code>.
+    An <a><code>AudioParam</code></a> object representing the amount of delay
+    (in seconds) to apply. Its default <code>value</code> is 0 (no delay).  Its
+    <a>nominal range</a> is [0; maxDelayTime] seconds, where
+    <code>maxDelayTime</code> is the value passed to the
+    <code>createDelay</code> method on the <a><code>AudioContext</code></a>.
     This parameter is <a>a-rate</a>.
   </dd>
 </dl>
@@ -1712,7 +1720,7 @@ interface is an <a><code>AudioNode</code></a> with a single input and single out
 <p>
   This interface represents a memory-resident audio asset (for one-shot sounds
   and other short audio clips). Its format is non-interleaved IEEE 32-bit linear
-  PCM with a nominal range of -1 -&gt; +1. It can contain one or more channels.
+  PCM with a <a>nominal range</a> of -1 -&gt; +1. It can contain one or more channels.
   Typically, it would be expected that the length of the PCM data would be
   fairly short (usually somewhat less than a minute).  For longer sounds, such
   as music soundtracks, streaming should be used with the <code>audio</code>
@@ -1885,7 +1893,8 @@ invoked in the following cases:
   <dt>readonly attribute AudioParam playbackRate</dt>
   <dd>
     The speed at which to render the audio stream. Its default
-    <code>value</code> is 1.  This parameter is <a>a-rate</a>.
+    <code>value</code> is 1. Its <a>nominal range</a> is [0; 10000]. This
+    parameter is <a>a-rate</a>.
   </dd>
 
   <dt>attribute boolean loop</dt>
@@ -2171,12 +2180,12 @@ be zero.
       read-only <a>Float32Array</a> to be present on the 
       <a><code>parameters</code></a> object exposed on the 
       <a>AudioProcessEvent</a> on subsequent audio processing events.  The 
-      AudioParam may immediately have its scheduling methods called, its 
-      .<a>value</a> set, or AudioNodes connected to it.</p>
+     <a><code> AudioParam</code></a> may immediately have its scheduling methods
+     called, its .<a>value</a> set, or AudioNodes connected to it.</p>
     <p>The <dfn
-      id="dfn-name">name</dfn> parameter is the name used for the read-only 
-      AudioParam added to the AudioWorkerNode, and the name used for the 
-      read-only Float32Array that will be present on the 
+      id="dfn-name">name</dfn> parameter is the name used for the read-only
+    <a><code>AudioParam</code></a> added to the AudioWorkerNode, and the name
+    used for the read-only Float32Array that will be present on the 
       <a><code>parameters</code></a> object exposed on subsequent 
       <a>AudioProcessEvent</a>s.</p>
     <p>The <dfn
@@ -2204,7 +2213,7 @@ be zero.
 </dl>
 </dl>
   <p>Note that <a>AudioWorkerNode</a> objects will also have read-only 
-    AudioParam objects for each named parameter added via the 
+    <a><code>AudioParam</code></a> objects for each named parameter added via the 
     <a>addParameter</a> method.  As this is dynamic, it cannot be captured in 
     IDL.</p>
   
@@ -2257,7 +2266,7 @@ connected.
         stream is reduced - both by quantizing the value (simulating lower 
         bit-depth in integer-based audio), and by quantizing in time 
         (simulating a lower digital sample rate).  This example shows how to 
-        use AudioParams (in this case, treated as a-rate) inside an 
+        use <a><code>AudioParam</code></a>s (in this case, treated as a-rate) inside an 
         AudioWorker.</p>
 
     <h5>Main file javascript</h5>
@@ -2298,9 +2307,9 @@ onaudioprocess= function (e) {
   <section>
     <h4>A Volume Meter and Clip Detector</h4>
     <p>Another common need is a clip-detecting volume meter.  This example 
-      shows how to communicate basic parameters (that do not need AudioParam 
-      scheduling) across to a Worker, as well as communicating data back to 
-      the main thread.</p>
+      shows how to communicate basic parameters (that do not need
+      <a><code>AudioParam</code></a> scheduling) across to a Worker, as well as
+      communicating data back to the main thread.</p>
 
     <h5>Main file javascript</h5>
     <pre class="highlight">var vuNode = audioContext.createAudioWorker("vu_meter_worker.js", 1, 1);
@@ -2494,9 +2503,9 @@ This is an <code>Event</code> object which is dispatched to
       via <a>addParameter</a>.  As this is dynamic, this cannot be captured 
       in IDL.  The length of this Float32Array will correspond to the length 
       of the inputBuffer.  The contents of this Float32Array will be the 
-      values to be used for the AudioParam at the corresponding points in 
-      time.  It is expected that this Float32Array will be reused by the 
-      audio engine.</dd>
+      values to be used for the <a><code>AudioParam</code></a> at the
+      corresponding points in time.  It is expected that this Float32Array will
+      be reused by the audio engine.</dd>
 </dl>
 </section>
 
@@ -3258,35 +3267,35 @@ in the following operation:
   <dt> readonly attribute AudioParam threshold </dt>
   <dd>
     The decibel value above which the compression will start taking effect.  Its
-    default <code>value</code> is -24, with a nominal range of -100 to 0.
+    default <code>value</code> is -24. Its <a>nominal range</a> is [-100; 0].
   </dd>
   <dt> readonly attribute AudioParam knee </dt>
   <dd>
     A decibel value representing the range above the threshold where the
     curve smoothly transitions to the "ratio" portion. Its default
-    <code>value</code> is 30, with a nominal range of 0 to 40.
+    <code>value</code> is 30. Its <a>nominal range</a> is [0; 40].
   </dd>
   <dt> readonly attribute AudioParam ratio </dt>
   <dd>
     The amount of dB change in input for a 1 dB change in output. Its default
-    <code>value</code> is 12, with a nominal range of 1 to 20.
+    <code>value</code> is 12. Its <a>nominal range</a> is [0; 20].
   </dd>
   <dt> readonly attribute AudioParam reduction </dt>
   <dd>
     A read-only decibel value for metering purposes, representing the current
     amount of gain reduction that the compressor is applying to the signal. If
-    fed no signal the value will be 0 (no gain reduction).  The nominal range is
-    -20 to 0.
+    fed no signal the value will be 0 (no gain reduction).  Its <a>nominal
+    range</a> is [-20; 0].
   </dd>
   <dt> readonly attribute AudioParam attack </dt>
   <dd>
     The amount of time (in seconds) to reduce the gain by 10dB.   Its default
-    <code>value</code> is 0.003, with a nominal range of 0 to 1.
+    <code>value</code> is 0.003. Its <a>nominal range</a> is [0; 1].
   </dd>
   <dt> readonly attribute AudioParam release </dt>
   <dd>
     The amount of time (in seconds) to increase the gain by 10dB.  Its default
-    <code>value</code> is 0.250, with a nominal range of 0 to 1.
+    <code>value</code> is 0.250, with a <a>nominal range</a> of [0; 1].
   </dd>
 </dl>
 </section>
@@ -3493,19 +3502,22 @@ All attributes of the <a><code>BiquadFilterNode</code></a> are <a>k-rate</a>
   </dd>
   <dt>readonly attribute AudioParam frequency</dt>
   <dd>
-    The frequency at which the <a><code>BiquadFilterNode</code></a> will operate, in Hz.
-    Its default value is 350Hz, and its nominal range is from 10Hz to half the
-    Nyquist frequency.
+    The frequency at which the <a><code>BiquadFilterNode</code></a> will
+    operate, in Hz.  Its default value is 350Hz. Its <a>nominal range</a> is
+    [10; sampleRate/2], where <code>sampleRate</code> is the
+    <a href="#widl-AudioContext-sampleRate"><code>sampleRate</code></a> of the
+    <a>AudioContext</a>.
   </dd>
   <dt>readonly attribute AudioParam detune</dt>
-  <dd> A detune value, in cents, for the frequency</dd>
+  <dd> A detune value, in cents, for the frequency. Its <a>nominal range</a> is
+  [-1200; 1200].</dd>
   <dt>readonly attribute AudioParam Q</dt>
   <dd>
     The <a href="http://en.wikipedia.org/wiki/Q_factor">Q</a> factor has a
-    default value of 1, with a nominal range of 0.0001 to 1000.
+    default value of 1. Its <a>nominal range</a> is [0.0001; 1000].
   </dd>
   <dt>readonly attribute AudioParam gain</dt>
-  <dd>The gain has a default value of 0, with a nominal range of -40 to 40.</dd>
+  <dd>The gain has a default value of 0. Its <a>nominal range</a> is [-40; 40].</dd>
 
   <dt>void getFrequencyResponse() </dt>
   <dd>
@@ -3716,13 +3728,18 @@ to determine a <em>computedFrequency</em> value:
     <dt> readonly attribute AudioParam frequency </dt>
     <dd>
       The frequency (in Hertz) of the periodic waveform. Its default
-      <code>value</code> is 440. This parameter is <a>a-rate</a>.
+      <code>value</code> is 440. Its <a>nominal range</a> is [-sampleRate/2;
+      sampleRate/2], where <code>sampleRate</code> is the value of the
+      <a href="#widl-AudioContext-sampleRate"><code>sampleRate </code></a>
+      attribute of the <a><code>AudioContext</code></a>.  This parameter is
+      <a>a-rate</a>. 
     </dd>
     <dt> readonly attribute AudioParam detune </dt>
     <dd>
-      A detuning value (in Cents) which will offset the <a><code>frequency</code></a> by
-      the given amount. Its default <code>value</code> is 0.  This parameter is
-      <a>a-rate</a>.
+      A detuning value (in Cents) which will offset the
+      <a><code>frequency</code></a> by the given amount. Its default
+      <code>value</code> is 0. Its <a>nominal range</a> is [-1200; 1200]. This
+      parameter is <a>a-rate</a>.
     </dd>
 
     <dt> void start(optional double when = 0) </dt>
