@@ -230,9 +230,7 @@ so that more advanced capabilities can be added at a later time. </p>
 objects. Each node can
 have <dfn>inputs</dfn> and/or <dfn>outputs</dfn>. A <dfn>source node</dfn> has no inputs
 and a single output. A <dfn>destination node</dfn>  has
-one input and no outputs, the most common example being <a
-href="#AudioDestinationNode"><code>AudioDestinationNode</code></a> the final destination to the audio
-hardware. Other nodes such as filters can be placed between the source and destination nodes.
+one input and no outputs. Other nodes such as filters can be placed between the source and destination nodes.
 The developer doesn't have to worry about low-level stream format details
 when two objects are connected together; <a href="#channel-up-mixing-and-down-mixing">the right
 thing just happens</a>. For example, if a mono audio stream is connected to a
@@ -902,12 +900,11 @@ modules. These modules can be connected together to form <a
 href="#ModularRouting">processing graphs</a> for rendering audio to the
 audio hardware. Each node can have <dfn>inputs</dfn> and/or <dfn>outputs</dfn>.
 A <dfn>source node</dfn> has no inputs
-and a single output. An <a
-href="#AudioDestinationNode"><code>AudioDestinationNode</code></a> has
-one input and no outputs and represents the final destination to the audio
-hardware. Most processing nodes such as filters will have one input and one
-output.  Each type of <a><code>AudioNode</code></a> differs in the details of how it processes or synthesizes audio.  But, in general, an <a><code>AudioNode</code></a>
-will process its inputs (if it has any), and generate audio for its outputs (if it has any).
+and a single output. Most processing nodes such as filters will have one input and one
+output.  Each type of <a><code>AudioNode</code></a> differs in the details of
+how it processes or synthesizes audio.  But, in general, an
+<a><code>AudioNode</code></a> will process its inputs (if it has any), and
+generate audio for its outputs (if it has any).
  </p>
 
 <p>
@@ -1094,8 +1091,7 @@ way that other EventTargets accept events.
   </dd>
   <dt>readonly attribute unsigned long numberOfOutputs</dt>
   <dd>
-    The number of outputs coming out of the <a><code>AudioNode</code></a>. This will be 0
-    for an <a><code>AudioDestinationNode</code></a>.
+    The number of outputs coming out of the <a><code>AudioNode</code></a>.
   </dd>
 
   <dt>attribute unsigned long <dfn>channelCount</dfn></dt>
@@ -1182,15 +1178,25 @@ way that other EventTargets accept events.
 <section>
 <h2 id="AudioDestinationNode">The AudioDestinationNode Interface</h2>
 
-<p>This is an <a><code>AudioNode</code></a> representing the final audio destination and is
-what the user will ultimately hear. It can often be considered as an audio
-output device which is connected to speakers. All rendered audio to be heard
-will be routed to this node, a "terminal" node in the <a><code>AudioContext</code></a>'s routing
-graph. There is only a single AudioDestinationNode per <a><code>AudioContext</code></a>, provided
-through the <code>destination</code> attribute of <a><code>AudioContext</code></a>. </p>
+<p>
+  This is an <a><code>AudioNode</code></a> representing the final audio
+  destination and is what the user will ultimately hear. It can often be
+  considered as an audio output device which is connected to speakers. All
+  rendered audio to be heard will be routed to this node, a "terminal" node in
+  the <a><code>AudioContext</code></a>'s routing graph. There is only a single
+  AudioDestinationNode per <a><code>AudioContext</code></a>, provided through
+  the <code>destination</code> attribute of <a><code>AudioContext</code></a>.
+</p>
+<p>
+  The output of a <a><code>AudioDestinationNode</code></a> is the sum of its
+  inputs, allowing to capture the output of an <a><code>AudioContext</code></a>
+  into, for example, a <a><code>MediaStreamAudioDestinationNode</code></a>, or a
+  <a><code>MediaRecorder</code></a> (described in <cite> <a href="http://XXX">
+  MediaRecorder</a></cite>[[!MediaRecorder]])
+</p>
 <pre>
       numberOfInputs  : 1
-      numberOfOutputs : 0
+      numberOfOutputs : 1
 
       channelCount = 2;
       channelCountMode = "explicit";
@@ -1226,7 +1232,7 @@ through the <code>destination</code> attribute of <a><code>AudioContext</code></
     </p>
 
     <p>
-      For an<a><code>AudioDestinationNode</code></a> in an
+      For an <a><code>AudioDestinationNode</code></a> in an
       <a><code>OfflineAudioContext</code></a>, the
       <a href="#widl-AudioNode-channelCount"><code>channelCount</code></a> is
       determined when the offline context is created and this value may not be
