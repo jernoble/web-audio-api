@@ -1937,7 +1937,105 @@ invoked in the following cases:
   <h2 id="AudioStreamDecoder">The AudioStreamDecoder Interface</h2>
   <p>
     This interface represents an appendable decoder capable of decoding incomplete
+    audio data, and will generate an <code>AudioBuffer</code> when sufficient data has been appended.
+    The AudioStreamDecoder will continue to generate <code>AudioBuffer</code>s until it either
+    encounters an error or is explicitly closed.
   </p>
+  
+  <dl title="interface AudioStreamDecoder" class="idl">
+  <dt>readonly attribute boolean updating;</dt>
+  <dd>
+    Indicates whether the asynchronous section of an append() operation is running. This attribute is
+    set to false when the AudioStreamDecoder is created.
+  </dd>
+  <dt>readonly attribute boolean closed;</dt>
+  <dd>
+    Indicates whether further audio data can be appended. This attribute is set to false when the
+    AudioStreamDecoder is created.
+  </dd>
+  <dt>Promise&ltAudioBuffer&gt appendData()</dt>
+  <dd>
+    <dl class="parameters">
+      <dt>ArrayBuffer audioData</dt>
+      <dd>An ArrayBuffer containing compressed audio data</dd>
+    </dl>
+      <p>
+        The <var>input buffer</var> is a byte buffer used to hold unparsed bytes across appendData()
+        calls. The buffer is empty when the AudioStreamDecoder is created.</p>
+      <p>
+        The following steps must be performed:
+      </p>
+      <ol>
+        <li>Let <var>promise</var> be a new promise.</li>
+        <li>
+          If <a>audioData</a> is null or not a valid ArrayBuffer:
+          <ol>
+            <li>Let <var>error</var> be a <code>DOMException</code> whose name is <code>NotSupportedError</code>.</li>
+            <li>Reject <var>promise</var> with <var>error</var>.</li>
+            <li>Terminate this algorithm.
+          </ol>
+        </li>
+        <li>
+          If the <a>updating</a> attribute is set:
+          <ol>
+            <li>Let <var>error</var> be a <code>DOMException</code> whose name is <code>InvalidStateError</code>.</li>
+            <li>Reject <var>promise</var> with <var>error</var>.</li>
+            <li>Terminate this algorithm.
+          </ol>
+        </li>
+        <li>
+          If the <a>closed</a> attribute is set:
+          <ol>
+            <li>Let <var>error</var> be a <code>DOMException</code> whose name is <code>InvalidStateError</code>.</li>
+            <li>Reject <var>promise</var> with <var>error</var>.</li>
+            <li>Terminate this algorithm.
+          </ol>
+        </li>
+        <li>
+          Set the <a>updating</a> attribute to true.
+        </li>
+        <li>
+          Neuter the <a>audioData</a> ArrayBuffer in such a way that JavaScript code may not
+          access or modify the data anymore.
+        </li>
+        <li>Append the <a>audioData</a> ArrayBuffer to the <a>input buffer</a>.</li>
+        <li>Queue a decoding operation to be performed on another thread.</li>
+        <li>Return <var>promise</var>.</li>
+        <li>In the decoding thread:
+          <ol>
+            <li>Attempt to decode the encoded data in the <a>input buffer</a> into linear PCM.</li>
+            <li>
+              If a decoding error is encountered due to the audio format not being recognized or supported, or because
+              of corrupted/unexpected/inconsistent data, then, on the main thread's event loop:
+              <ol>
+                <li>Set the <a>closed</a> attribute to true.</li>
+                <li>Set the <a>updating</a> attribute to false.</li>
+                <li>Let <var>error</var> be a <code>DOMException</code> whose name is <code>"EncodingError"</code>.</li>
+                <li>Reject <var>promise</var> with <var>error</var>.</li>
+              </ol>
+            </li>
+            <li>Let the <var>decoded audio data</var> be the decoded linear PCM audio data produced by the previous step.</li>
+            <li>Remove from the beginning of the <var>input buffer</var> that encoded data which produced the <var>decoded audio data</var>.</li>
+            <li>
+              If the sample rate of the <var>decoded audio data</var> is different than the sample rate of the
+              <a><code>AudioContext</code></a>:
+              <ol>
+                <li>Resample the <var>decoded audio data</var> to the sample-rate of the <a><code>AudioContext</code></a>.</li>
+              </ol>
+            </li>
+            <li></li>
+            <li>On the main thread's event loop:
+              <ol>
+                <li>Set the <a>updating</a> attribute to false.</li>
+                <li>Let <var>buffer</var> be an <code>AudioBuffer</code> containing the <var>decoded audio data</var>.</li>
+                <li>Resolve <var>promise</var> with <var>buffer</var>.</li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </dd>
+  </dl>
 </section>
 
 <section>
